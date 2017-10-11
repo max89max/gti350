@@ -255,7 +255,10 @@ public class DrawingView extends View {
 		gw.setCoordinateSystemToPixels();
 
 		lassoButton.draw( gw, currentMode == MODE_LASSO );
-
+		//Kian Perami
+		effacerButton.draw( gw, currentMode == MODE_EFFACER );
+		effacerEncadrer.draw( gw, currentMode == MODE_ENCADRER );
+		//Kian Perami: End
 		if ( currentMode == MODE_LASSO ) {
 			MyCursor lassoCursor = cursorContainer.getCursorByType( MyCursor.TYPE_DRAGGING, 0 );
 			if ( lassoCursor != null ) {
@@ -350,6 +353,10 @@ public class DrawingView extends View {
 								currentMode = MODE_LASSO;
 								cursor.setType( MyCursor.TYPE_BUTTON );
 							}
+							else if ( effacerButton.contains(p_pixels) ) {
+								currentMode = MODE_EFFACER;
+								cursor.setType( MyCursor.TYPE_BUTTON );
+							}
 							else if ( indexOfShapeBeingManipulated >= 0 ) {
 								currentMode = MODE_SHAPE_MANIPULATION;
 								cursor.setType( MyCursor.TYPE_DRAGGING );
@@ -372,6 +379,17 @@ public class DrawingView extends View {
 								cursor1.getCurrentPosition()
 							);
 						}
+						//Kian Perami : Ca fait une translation de la camera avec un seul doigt
+						else if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE ) {
+							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
+							gw.panAndZoomBasedOnDisplacementOfTwoPoints(
+									cursor0.getPreviousPosition(),
+									cursor0.getPreviousPosition(),
+									cursor0.getCurrentPosition(),
+									cursor0.getCurrentPosition()
+							);
+						}
+						//Kian Perami : End
 						else if ( type == MotionEvent.ACTION_UP ) {
 							cursorContainer.removeCursorByIndex( cursorIndex );
 							if ( cursorContainer.getNumCursors() == 0 )
@@ -392,12 +410,27 @@ public class DrawingView extends View {
 								gw.convertPixelsToWorldSpaceUnits( cursor1.getCurrentPosition() )
 							);
 						}
+						//Kian Perami : Ca fait une translation de la forme avec un seul doigt
+						if ( cursorContainer.getNumCursors() == 1 && type == MotionEvent.ACTION_MOVE && indexOfShapeBeingManipulated>=0 ) {
+							MyCursor cursor0 = cursorContainer.getCursorByIndex( 0 );
+							Shape shape = shapeContainer.getShape( indexOfShapeBeingManipulated );
+
+							Point2DUtil.transformPointsBasedOnDisplacementOfTwoPoints(
+									shape.getPoints(),
+									gw.convertPixelsToWorldSpaceUnits( cursor0.getPreviousPosition() ),
+									gw.convertPixelsToWorldSpaceUnits( cursor0.getPreviousPosition() ),
+									gw.convertPixelsToWorldSpaceUnits( cursor0.getCurrentPosition() ),
+									gw.convertPixelsToWorldSpaceUnits( cursor0.getCurrentPosition() )
+							);
+						}
+						// Kian Perami : End
 						else if ( type == MotionEvent.ACTION_UP ) {
 							cursorContainer.removeCursorByIndex( cursorIndex );
 							if ( cursorContainer.getNumCursors() == 0 ) {
 								currentMode = MODE_NEUTRAL;
 								indexOfShapeBeingManipulated = -1;
 							}
+
 						}
 						break;
 					case MODE_LASSO :
@@ -434,6 +467,33 @@ public class DrawingView extends View {
 							}
 						}
 						break;
+						//Kian Perami: Pour effacer la forme de l'application
+						case MODE_EFFACER:
+							//En tenant le bouton pour effacer
+							if (type == MotionEvent.ACTION_DOWN && cursorContainer.getNumCursors() == 2) {
+								MyCursor cursor1 = cursorContainer.getCursorByIndex( 1 );
+
+								if(shapeContainer.shapes.size() != 0){
+									//Retrieve Shape being tapped in Erase mode( Erreur a modifier!)
+									indexOfShapeBeingManipulated = shapeContainer.indexOfShapeContainingGivenPoint(cursor1.getCurrentPosition());
+									//Remove the shape from the array list
+									shapeContainer.shapes.remove(shapeContainer.getShape( indexOfShapeBeingManipulated ));
+									selectedShapes.clear();
+								}
+							}
+							else if ( type == MotionEvent.ACTION_MOVE ) {
+								// no further updating necessary here
+							}
+							else if ( type == MotionEvent.ACTION_UP ) {
+								cursorContainer.removeCursorByIndex( cursorIndex );
+								if ( cursorContainer.getNumCursors() == 0 ) {
+									currentMode = MODE_NEUTRAL;
+									indexOfShapeBeingManipulated = -1;
+									selectedShapes.clear();
+								}
+							}
+							break;
+						//Kian Perami : End
 					}
 					
 					v.invalidate();
