@@ -44,7 +44,7 @@ public class Point2D {
 	// used to pass coordinates directly to OpenGL routines
 	public float [] get() { return p; }
 
-	// return the difference between two given points
+	// return the difference between two given selectedLassoResultPoints
 	static public Vector2D diff( Point2D a, Point2D b ) {
 		return new Vector2D( a.x()-b.x(), a.y()-b.y() );
 	}

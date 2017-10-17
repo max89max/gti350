@@ -8,6 +8,8 @@ class ShapeContainer {
 
 	public Shape getShape( int index ) { return shapes.get(index); }
 
+	public Shape deleteShape( int index ) { return shapes.remove(index); }
+
 	public void addShape( ArrayList< Point2D > points /* in world space */ ) {
 		Shape s = new Shape( points );
 		shapes.add( s );

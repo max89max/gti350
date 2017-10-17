@@ -7,7 +7,7 @@ import java.util.ListIterator;
 
 
 
-// This is used to sort points by some "score",
+// This is used to sort selectedLassoResultPoints by some "score",
 // which could be an angle or other metric associated with each point.
 class Point2DAndScore {
 	public Point2D point;
@@ -78,7 +78,7 @@ public class Point2DUtil {
 		return returnValue;
 	}
 
-	// Returns the points on the convex hull in counter-clockwise order
+	// Returns the selectedLassoResultPoints on the convex hull in counter-clockwise order
 	// (assuming a coordinate system with x+ right and y+ up).
 	// Uses the well known algorithm "Graham's scan" for computing the convex hull in 2D,
 	// an algorithm nicely explained at
@@ -96,8 +96,8 @@ public class Point2DUtil {
 			return returnValue;
 		}
 
-		// There could be one or more points with minimal y coordinate.
-		// We'll call these the "bottom" points.
+		// There could be one or more selectedLassoResultPoints with minimal y coordinate.
+		// We'll call these the "bottom" selectedLassoResultPoints.
 		// Of these, we find the one with minimal x coordinate (the "bottom left" point)
 		// and maximal x coordinate (the "bottom right" point).
 		int indexOfBottomLeftPoint = 0;
@@ -123,9 +123,9 @@ public class Point2DUtil {
 		}
 
 		// Imagine that for each point, we compute the point's angle with respect to bottomLeftPoint,
-		// and then sort the points by this angle.
-		// This is equivalent to sorting the points by their cotangent, which is faster to compute.
-		// Points with minimal y coordinate (i.e., "bottom" points)
+		// and then sort the selectedLassoResultPoints by this angle.
+		// This is equivalent to sorting the selectedLassoResultPoints by their cotangent, which is faster to compute.
+		// Points with minimal y coordinate (i.e., "bottom" selectedLassoResultPoints)
 		// will be given a cotangent of +infinity and dealt with later.
 		Point2DAndScore [] pointsWithCotangents = new Point2DAndScore[ points.size() ];
 		for ( int i = 0; i < points.size(); ++i ) {
@@ -140,19 +140,19 @@ public class Point2DUtil {
 				pointsWithCotangents[i] = new Point2DAndScore( p, delta_x/delta_y /* the cotangent */, false );
 			}
 		}
-		// sort the points by their cotangent
+		// sort the selectedLassoResultPoints by their cotangent
 		Arrays.sort(pointsWithCotangents, new Point2DAndScoreComparator());
 
-		// We'll need to be able to efficiently remove points from consideration,
+		// We'll need to be able to efficiently remove selectedLassoResultPoints from consideration,
 		// so we copy them into a linked list.
-		// In doing this, we also reverse the order of points
+		// In doing this, we also reverse the order of selectedLassoResultPoints
 		// (so they are in descending order of cotangent, i.e., in counter-clockwise order).
-		// The points with +infinity cotangent (i.e. the "bottom" points)
+		// The selectedLassoResultPoints with +infinity cotangent (i.e. the "bottom" selectedLassoResultPoints)
 		// can also be removed from consideration here,
-		// so long as we keep the "bottom left" and "bottom right" points.
+		// so long as we keep the "bottom left" and "bottom right" selectedLassoResultPoints.
 		LinkedList< Point2D > orderedPoints = new LinkedList< Point2D >();
 		orderedPoints.add( bottomLeftPoint );
-		// check if the "bottom left" and "bottom right" points are distinct
+		// check if the "bottom left" and "bottom right" selectedLassoResultPoints are distinct
 		if ( indexOfBottomLeftPoint != indexOfBottomRightPoint )
 			orderedPoints.add( bottomRightPoint );
 		for ( int i = pointsWithCotangents.length - 1; i >= 0; --i ) {
@@ -162,7 +162,7 @@ public class Point2DUtil {
 		}
 
 		if ( orderedPoints.size() > 2 ) {
-			// We will loop through the ordered points, processing 3 consecutive points at a time.
+			// We will loop through the ordered selectedLassoResultPoints, processing 3 consecutive selectedLassoResultPoints at a time.
 			// Two iterators are used to backup and move forward.
 			Point2D p0 = orderedPoints.get(0);
 			Point2D p1 = orderedPoints.get(1);
@@ -193,7 +193,7 @@ public class Point2DUtil {
 				}
 				else {
 					// Either we have a right-hand turn,
-					// or the points are collinear (with the 3rd point either in front, or behind, the 2nd)
+					// or the selectedLassoResultPoints are collinear (with the 3rd point either in front, or behind, the 2nd)
 					// In any case, we remove the 2nd point from consideration and (try to) backup.
 					assert it3.hasPrevious();
 					it3.previous();
@@ -298,7 +298,7 @@ public class Point2DUtil {
 		if ( points.length < 2 )
 			return false;
 
-		// Compute the mean of the points
+		// Compute the mean of the selectedLassoResultPoints
 		double meanX = 0, meanY = 0;
 		int i;
 		for ( i = 0; i < points.length; ++i ) {
@@ -364,7 +364,7 @@ public class Point2DUtil {
 	// and then drags their finger.
 	// The sheet of paper will be translated and rotated by the finger.
 	// This method implements such a transformation.
-	// The given points could be the corners of the sheet of paper,
+	// The given selectedLassoResultPoints could be the corners of the sheet of paper,
 	// or vertices of a polygon or other shape.
 	// The old and new location of the finger is also given.
 	// This method can be useful for allowing the user to drag around
@@ -373,7 +373,7 @@ public class Point2DUtil {
 	//
 	static public void transformPointsBasedOnDisplacementOfOnePoint(
 		ArrayList<Point2D> points,
-		// these should, of course, be in the same coordinate system as the points to transform
+		// these should, of course, be in the same coordinate system as the selectedLassoResultPoints to transform
 		Point2D P_old,
 		Point2D P_new
 	) {
@@ -415,14 +415,14 @@ public class Point2DUtil {
 		// Output.  Caller must pass in a 1-element array used to pass value back to caller.
 		float [] scaleFactor
 	) {
-		// Compute midpoints of each pair of points
+		// Compute midpoints of each pair of selectedLassoResultPoints
 		Point2D M1 = Point2D.average( A_old, B_old );
 		Point2D M2 = Point2D.average( A_new, B_new );
 
-		// This is the translation that the points should undergo.
+		// This is the translation that the selectedLassoResultPoints should undergo.
 		translation.copy( Point2D.diff( M2, M1 ) );
 
-		// Compute a vector associated with each pair of points.
+		// Compute a vector associated with each pair of selectedLassoResultPoints.
 		Vector2D v1 = Point2D.diff( A_old, B_old );
 		Vector2D v2 = Point2D.diff( A_new, B_new );
 
@@ -440,7 +440,7 @@ public class Point2DUtil {
 	// or 2-finger manipulation, as in a "pinch" gesture
 	static public void transformPointsBasedOnDisplacementOfTwoPoints(
 		ArrayList<Point2D> points,
-		// these should, of course, be in the same coordinate system as the points to transform
+		// these should, of course, be in the same coordinate system as the selectedLassoResultPoints to transform
 		Point2D A_old, Point2D B_old,
 		Point2D A_new, Point2D B_new
 	) {

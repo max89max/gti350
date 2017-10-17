@@ -95,14 +95,14 @@ class GraphicsWrapper {
 		Point2D A_old, Point2D B_old,
 		Point2D A_new, Point2D B_new
 	) {
-		// Compute midpoints of each pair of points
+		// Compute midpoints of each pair of selectedLassoResultPoints
 		Point2D M1 = Point2D.average( A_old, B_old );
 		Point2D M2 = Point2D.average( A_new, B_new );
 
 		// This is the translation that the world should appear to undergo.
 		Vector2D translation = Point2D.diff( M2, M1 );
 
-		// Compute a vector associated with each pair of points.
+		// Compute a vector associated with each pair of selectedLassoResultPoints.
 		Vector2D v1 = Point2D.diff( A_old, B_old );
 		Vector2D v2 = Point2D.diff( A_new, B_new );
 
